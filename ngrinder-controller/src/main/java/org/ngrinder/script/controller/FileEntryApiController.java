@@ -49,6 +49,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.nhncorp.lucy.security.xss.XssPreventer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -282,6 +283,7 @@ public class FileEntryApiController {
 							 @RequestParam String description,
 							 @RequestParam("uploadFile") MultipartFile file) {
 		try {
+			description = XssPreventer.escape(description);
 			upload(user, path, description, file);
 		} catch (IOException e) {
 			LOG.error("Error while getting file content: {}", e.getMessage(), e);
@@ -290,6 +292,8 @@ public class FileEntryApiController {
 	}
 
 	private void upload(User user, String path, String description, MultipartFile file) throws IOException {
+		description = XssPreventer.escape(description);
+
 		FileEntry fileEntry = new FileEntry();
 		fileEntry.setContentBytes(file.getBytes());
 		fileEntry.setDescription(description);
